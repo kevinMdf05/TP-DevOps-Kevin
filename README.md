@@ -122,6 +122,26 @@ En cas d'échec d'un test, les étapes suivantes ne s'exécutent pas.
 └── README.md
 ```
 
+## Bonus : Monitoring (Prometheus + Grafana)
+
+La stack `kube-prometheus-stack` est déployée via Helm dans le namespace `monitoring`.
+Le backend Node.js est instrumenté avec `prom-client` et expose `/metrics`.
+Un `ServiceMonitor` indique à Prometheus de scraper le backend toutes les 15 s.
+
+- Grafana : http://<VM_IP>:30090 (admin / admin)
+- Dashboards K8s pré-intégrés (Node, Pods, API Server, etc.)
+- Alertmanager embarqué
+
+### Installation (une seule fois sur la VM)
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm upgrade --install kps prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace \
+  -f k8s/monitoring-values.yaml --wait
+```
+
 ## Difficultés rencontrées
 
 Voir le rapport de projet (`docs/rapport.md`).

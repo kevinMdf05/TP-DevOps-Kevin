@@ -33,6 +33,7 @@ Une entreprise souhaite automatiser le déploiement de son application web afin 
 | Gestion des variables/secrets                       | ✅      |
 | Documentation (README + rapport)                    | ✅      |
 | **Bonus : Multi-stage build**                       | ✅      |
+| **Bonus : Monitoring Prometheus + Grafana**         | ✅      |
 
 ---
 
@@ -210,6 +211,38 @@ pod/frontend-577fc7647-xkdw8   1/1 Running
 **📸 Capture à prendre** : page http://4.212.91.15:30080 dans le navigateur avec message visible (la capture `docs/screenshots/prod.png` fournie dans le dépôt).
 
 ---
+
+## Bonus — Monitoring Prometheus + Grafana
+
+Installation en une commande :
+
+```bash
+helm upgrade --install kps prometheus-community/kube-prometheus-stack \
+  --namespace monitoring --create-namespace \
+  -f k8s/monitoring-values.yaml --wait
+```
+
+Composants déployés :
+- **Prometheus** (retention 3 jours, storage 2 Gi)
+- **Grafana** (NodePort 30090, admin/admin, dashboards K8s pré-intégrés)
+- **Alertmanager**
+- **Node Exporter** (métriques hôte) + **kube-state-metrics**
+
+Instrumentation applicative :
+- Backend Node.js : `prom-client` expose `/metrics` (node process, event-loop, HTTP requests, latency histogrammes)
+- `ServiceMonitor` dans `k8s/50-servicemonitor.yaml` — Prometheus scrape le backend toutes les 15 s via le label `release: kps`
+
+Vérification :
+
+```
+curl http://4.212.91.15:30090/login       # Grafana OK
+curl http://backend.tp-app.svc:3000/metrics  # depuis un pod, retourne 20+ métriques
+GET /api/v1/targets?state=active | grep backend-metrics  # target UP
+```
+
+**📸 Captures à prendre** :
+- Login Grafana + un dashboard "Kubernetes / Compute Resources / Namespace (Pods)" filtré sur `tp-app`
+- Prometheus Targets page (confirme `serviceMonitor/tp-app/backend-metrics/0` = UP)
 
 ## 6. Gestion des variables et secrets (détail)
 
