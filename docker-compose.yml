@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tp-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-app}
+      POSTGRES_DB: ${DB_NAME:-appdb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-app} -d ${DB_NAME:-appdb}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks: [appnet]
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    image: tp-backend:local
+    container_name: tp-backend
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-app}
+      DB_PASSWORD: ${DB_PASSWORD:-app}
+      DB_NAME: ${DB_NAME:-appdb}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [appnet]
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    image: tp-frontend:local
+    container_name: tp-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks: [appnet]
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+networks:
+  appnet:
+    driver: bridge
