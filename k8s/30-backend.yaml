@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: tp-app
+  labels: { app: backend }
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels: { app: backend }
+  template:
+    metadata:
+      labels: { app: backend }
+    spec:
+      containers:
+        - name: backend
+          # __BACKEND_IMAGE__ remplacé par le pipeline CI/CD
+          image: __BACKEND_IMAGE__
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef: { name: app-config }
+            - secretRef:    { name: db-credentials }
+          readinessProbe:
+            httpGet: { path: /health, port: 3000 }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /health, port: 3000 }
+            initialDelaySeconds: 20
+            periodSeconds: 20
+          resources:
+            requests: { cpu: "25m", memory: "64Mi" }
+            limits:   { cpu: "300m", memory: "256Mi" }
+      imagePullSecrets:
+        - name: ghcr-pull
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: tp-app
+spec:
+  selector: { app: backend }
+  ports:
+    - port: 3000
+      targetPort: 3000

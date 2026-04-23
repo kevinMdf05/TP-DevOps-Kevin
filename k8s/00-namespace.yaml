@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tp-app
+  labels:
+    app: tp-app
