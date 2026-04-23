@@ -34,6 +34,7 @@ Une entreprise souhaite automatiser le déploiement de son application web afin 
 | Documentation (README + rapport)                    | ✅      |
 | **Bonus : Multi-stage build**                       | ✅      |
 | **Bonus : Monitoring Prometheus + Grafana**         | ✅      |
+| **Bonus : Terraform (Infrastructure-as-Code)**      | ✅      |
 
 ---
 
@@ -243,6 +244,40 @@ GET /api/v1/targets?state=active | grep backend-metrics  # target UP
 **📸 Captures à prendre** :
 - Login Grafana + un dashboard "Kubernetes / Compute Resources / Namespace (Pods)" filtré sur `tp-app`
 - Prometheus Targets page (confirme `serviceMonitor/tp-app/backend-metrics/0` = UP)
+
+## Bonus — Infrastructure-as-Code avec Terraform
+
+Dossier `terraform/` : équivalent déclaratif du script `docs/azure-setup.sh`.
+
+```
+terraform/
+├── main.tf        # RG, VNet, NSG, NIC, PublicIP, VM Ubuntu 22.04
+├── variables.tf   # nom VM, taille, région, chemin clé SSH
+├── outputs.tf     # IP publique, commande SSH, URLs app et Grafana
+└── README.md      # mode d'emploi
+```
+
+Validation locale :
+
+```
+terraform fmt -check   # OK
+terraform init         # provider azurerm 4.x
+terraform validate     # Success
+```
+
+Commandes à lancer pour provisionner :
+
+```bash
+cd terraform
+terraform init
+terraform plan
+terraform apply -auto-approve
+# outputs : vm_public_ip, vm_ssh_command, app_url, grafana_url
+```
+
+Avantages d'avoir conservé **les deux approches** (script + Terraform) :
+- Script = pédagogique, étape-par-étape, lisible en rapport
+- Terraform = reproductible, idempotent, versionnable dans git
 
 ## 6. Gestion des variables et secrets (détail)
 

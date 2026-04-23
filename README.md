@@ -122,6 +122,16 @@ En cas d'échec d'un test, les étapes suivantes ne s'exécutent pas.
 └── README.md
 ```
 
+## Bonus : Terraform (Infrastructure-as-Code)
+
+Dossier `terraform/` : provisioning reproductible de la VM Azure.
+
+```bash
+cd terraform
+terraform init
+terraform apply -auto-approve
+```
+
 ## Bonus : Monitoring (Prometheus + Grafana)
 
 La stack `kube-prometheus-stack` est déployée via Helm dans le namespace `monitoring`.
