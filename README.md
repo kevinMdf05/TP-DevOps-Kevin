@@ -128,5 +128,6 @@ Voir le rapport de projet (`docs/rapport.md`).
 
 ## Auteur
 
-TP réalisé dans le cadre d'un module DevOps (2026).
+**Kevin Chaillot** — Efrei Bachelor Ingénierie & numérique
+TP réalisé dans le cadre d'un module DevOps (avril 2026).
 
