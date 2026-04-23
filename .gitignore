@@ -1,0 +1,26 @@
+# Env
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+
+# Secrets
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+kubeconfig
