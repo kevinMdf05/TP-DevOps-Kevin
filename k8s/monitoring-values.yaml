@@ -1,0 +1,48 @@
+# Values pour kube-prometheus-stack allégé (VM B2s 4 Go RAM)
+# Grafana exposé en NodePort 30090
+
+grafana:
+  adminPassword: "admin"   # à changer en prod, ici ok pour TP
+  service:
+    type: NodePort
+    nodePort: 30090
+  persistence:
+    enabled: false         # évite un second PVC, ok pour TP
+  defaultDashboardsTimezone: "browser"
+
+prometheus:
+  prometheusSpec:
+    retention: 3d
+    resources:
+      requests: { cpu: "50m", memory: "256Mi" }
+      limits:   { cpu: "500m", memory: "768Mi" }
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      requests: { cpu: "10m", memory: "32Mi" }
+      limits:   { cpu: "100m", memory: "128Mi" }
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+
+# Allège ce qui n'est pas indispensable pour un TP
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeProxy:
+  enabled: false

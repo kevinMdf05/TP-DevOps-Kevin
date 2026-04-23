@@ -46,8 +46,10 @@ kind: Service
 metadata:
   name: backend
   namespace: tp-app
+  labels: { app: backend }
 spec:
   selector: { app: backend }
   ports:
-    - port: 3000
+    - name: http
+      port: 3000
       targetPort: 3000

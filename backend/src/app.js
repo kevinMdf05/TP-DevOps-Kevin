@@ -1,11 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const { pool, ping } = require('./db');
+const { register, metricsMiddleware } = require('./metrics');
 
 function buildApp() {
   const app = express();
   app.use(cors());
   app.use(express.json());
+  app.use(metricsMiddleware);
+
+  app.get('/metrics', async (_req, res) => {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  });
 
   app.get('/health', async (_req, res) => {
     try {

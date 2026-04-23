@@ -50,6 +50,9 @@ sed "s|__BACKEND_IMAGE__|$BACKEND_IMAGE|g" "$MANIFESTS_DIR/30-backend.yaml" | ku
 echo "[deploy] rendering and applying frontend (image=$FRONTEND_IMAGE)"
 sed "s|__FRONTEND_IMAGE__|$FRONTEND_IMAGE|g" "$MANIFESTS_DIR/40-frontend.yaml" | kubectl apply -f -
 
+echo "[deploy] applying ServiceMonitor for Prometheus (ignore if CRDs absent)"
+kubectl apply -f "$MANIFESTS_DIR/50-servicemonitor.yaml" 2>/dev/null || echo "[deploy] ServiceMonitor CRD not present yet, skip"
+
 echo "[deploy] forcing rollout restart to pull new images"
 kubectl -n "$NS" rollout restart deployment/backend deployment/frontend
 

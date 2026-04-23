@@ -1,0 +1,20 @@
+# ServiceMonitor : indique à Prometheus (kube-prometheus-stack)
+# de scraper /metrics sur le Service backend.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: backend-metrics
+  namespace: tp-app
+  labels:
+    # Label attendu par défaut par kube-prometheus-stack
+    release: kps
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  namespaceSelector:
+    matchNames: ["tp-app"]
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s
